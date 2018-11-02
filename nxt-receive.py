@@ -5,14 +5,14 @@ import sys
 credentials = pika.PlainCredentials('craig', 'craig')
 parameters=pika.ConnectionParameters('10.238.131.199',
                                            5672,
-                                          'nxt-eng',
+                                          'arrisSales',
                                           credentials)
 
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
 channel.exchange_declare(exchange='nxt-eng-in',
-                         exchange_type='topic',
+                         exchange_type='tenant-out',
                          durable=True )
 
 result = channel.queue_declare(durable=True)

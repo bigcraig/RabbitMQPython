@@ -10,13 +10,13 @@ import json
 credentials = pika.PlainCredentials('craig', 'craig')
 parameters=pika.ConnectionParameters('10.238.131.199',
                                            5672,
-                                          'nxt-eng',
+                                          'arrisSales',
                                           credentials)
 
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
-channel.exchange_declare(exchange='nxt-eng-in',
+channel.exchange_declare(exchange='tenant-out',
                          exchange_type='topic',
                          durable=True )
 
@@ -29,7 +29,7 @@ if not binding_keys:
     sys.exit(1)
 
 for binding_key in binding_keys:
-    channel.queue_bind(exchange='nxt-eng-in',
+    channel.queue_bind(exchange='tenant-out',
                        queue=queue_name,
                        routing_key=binding_key)
 
