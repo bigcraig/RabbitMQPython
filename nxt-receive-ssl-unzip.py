@@ -8,10 +8,6 @@ import gzip
 import StringIO
 import json
 import ssl
-context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-context.verify_mode = ssl.CERT_REQUIRED
-context.load_verify_locations('ca_certificate_bundle.pem')
-SSLOptions = pika.SSLOptions(context);
 
 credentials = pika.PlainCredentials('craig', 'craig')
 parameters=pika.ConnectionParameters(host='10.238.131.199',
@@ -19,7 +15,8 @@ parameters=pika.ConnectionParameters(host='10.238.131.199',
                                            virtual_host='arrisSales',
                                            credentials=pika.PlainCredentials('craig', 'craig'),
                                            ssl=True,
-                                           ssl_options={"cert_reqs": ssl.CERT_REQUIRED, "ca_certs": 'ca_certificate_bundle.pem'})
+                                           ssl_options={"cert_reqs": ssl.CERT_NONE, "ca_certs": 'ca_certificate_bundle.pem'})
+                                           
 
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()

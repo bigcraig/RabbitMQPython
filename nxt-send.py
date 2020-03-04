@@ -11,12 +11,14 @@ parameters=pika.ConnectionParameters('10.238.131.199',
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
-channel.exchange_declare(exchange='nxt-eng-in',
+channel.exchange_declare(exchange='tenant-in',
                          exchange_type='topic',
                          durable=True )
 
 result = channel.queue_declare(durable=True)
 queue_name = result.method.queue
+
+print("Queue Name  %r" %(queue_name))
 
 binding_keys = sys.argv[1:]
 if not binding_keys:
@@ -24,7 +26,7 @@ if not binding_keys:
     sys.exit(1)
 
 for binding_key in binding_keys:
-    channel.queue_bind(exchange='nxt-eng-in',
+    channel.queue_bind(exchange='tenant-in',
                        queue=queue_name,
                        routing_key=binding_key)
 

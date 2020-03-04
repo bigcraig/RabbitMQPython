@@ -7,11 +7,15 @@ import gzip
 
 import StringIO
 import json
-credentials = pika.PlainCredentials('craig', 'craig')
-parameters=pika.ConnectionParameters('10.238.131.199',
-                                           5672,
-                                          'arrisSales',
-                                          credentials)
+import ssl
+
+credentials = pika.PlainCredentials('tslab', 'tslab')
+parameters=pika.ConnectionParameters(host='10.238.129.124',
+                                           port=5671,
+                                           virtual_host='tslab',
+                                           credentials=pika.PlainCredentials('tslab', 'tslab'),
+                                           ssl=True)
+                                           
 
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
@@ -19,9 +23,9 @@ channel = connection.channel()
 channel.exchange_declare(exchange='tenant-out',
                          exchange_type='topic',
                          durable=True )
+
 result = channel.queue_declare()
 queue_name = result.method.queue
-
 
 binding_keys = sys.argv[1:]
 if not binding_keys:

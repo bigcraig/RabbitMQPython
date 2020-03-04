@@ -1,22 +1,27 @@
 #!/usr/bin/env python
 import pika
 import sys
+import base64
+import zlib
+import gzip
 
-credentials = pika.PlainCredentials('craig', 'craig')
-parameters=pika.ConnectionParameters('10.238.131.199',
+import StringIO
+import json
+credentials = pika.PlainCredentials('tslab', 'tslab')
+parameters=pika.ConnectionParameters('10.238.129.124',
                                            5672,
-                                          'arrisSales',
+                                          'tslab',
                                           credentials)
 
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
-channel.exchange_declare(exchange='nxt-eng-in',
+channel.exchange_declare(exchange='tenant-out',
                          exchange_type='topic',
                          durable=True )
-
-result = channel.queue_declare(durable=True)
+result = channel.queue_declare()
 queue_name = result.method.queue
+
 
 binding_keys = sys.argv[1:]
 if not binding_keys:
@@ -24,15 +29,19 @@ if not binding_keys:
     sys.exit(1)
 
 for binding_key in binding_keys:
-    channel.queue_bind(exchange='nxt-eng-in',
+    channel.queue_bind(exchange='tenant-out',
                        queue=queue_name,
                        routing_key=binding_key)
 
 print(' [*] Waiting for NXT messages. To exit press CTRL+C')
 
 def callback(ch, method, properties, body):
-    print(" [x] %r:%r" % (method.routing_key, body))
 
+      decoded_data=gzip.GzipFile(fileobj=StringIO.StringIO(body)).read()
+      print(" Routing Key %r" % (method.routing_key))
+      parsed = json.loads(decoded_data) 
+      print json.dumps(parsed, indent=4, sort_keys=True)  
+      print ("   " )  
 channel.basic_consume(callback,
                       queue=queue_name,
                       no_ack=True)
